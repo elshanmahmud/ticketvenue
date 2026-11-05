@@ -18,22 +18,61 @@
     </header>
     <div class="app-container">
       <main class="main-content">
-        <h3>Venue</h3>
+        <h2>Venue</h2>
+
         <div class="section">
-          <h4>section 1</h4>
-          <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</p>
+          <h4>Section 1</h4>
+          <div class="seat-row">
+            <button class="seat">1</button>
+            <button class="seat">2</button>
+            <button class="seat">3</button>
+            <button class="seat">4</button>
+          </div>
+          <div class="seat-row">
+            <button class="seat">1</button>
+            <button class="seat">2</button>
+            <button class="seat">3</button>
+            <button class="seat">4</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h4>Section 2</h4>
+          <div class="seat-row">
+            <button class="seat">1</button>
+            <button class="seat">2</button>
+            <button class="seat">3</button>
+            <button class="seat">4</button>
+          </div>
         </div>
         <div class="section">
-          <h4>section 2</h4>
-          <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit.</p>
+          <h4>Section 3</h4>
+          <div class="seat-row">
+            <button class="seat">1</button>
+            <button class="seat">2</button>
+            <button class="seat">3</button>
+            <button class="seat">4</button>
+          </div>
         </div>
       </main>
 
       <div class="inspection-panel">
         <h2>Seat Inspection</h2>
-        <div>
-          <p>Info about the seat such as price and etc.</p>
+        <div class="seat-details">
+          <p>
+            <strong>Section:</strong>
+            <span id="seat-section">Select a seat</span>
+          </p>
+          <p><strong>Row:</strong> <span id="seat-row">-</span></p>
+          <p><strong>Seat Number:</strong> <span id="seat-number">-</span></p>
+          <p><strong>Price:</strong> <span id="seat-price">$0.00</span></p>
+          <p>
+            <strong>Status:</strong> <span id="seat-status">None selected</span>
+          </p>
         </div>
+        <button id="add-to-cart-btn" class="add-to-cart-btn" disabled>
+          ADD TO CART
+        </button>
       </div>
     </div>
   </body>
