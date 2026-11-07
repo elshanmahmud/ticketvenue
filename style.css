@@ -94,3 +94,15 @@ header {
   cursor: pointer;
   font-size: 12px;
 }
+
+.cart-section {
+  margin-top: 20px;
+  border-top: 1px solid #ccc;
+  padding-top: 15px;
+}
+.cart-total {
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
