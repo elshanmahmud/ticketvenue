@@ -2,6 +2,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const blockUpper = document.getElementById("block-upper");
   const blockLower = document.getElementById("block-lower");
 
+  function getRowConfig(rowNum) {
+    if (rowNum >= 11) {
+      return { section: "Balcony Tier", price: 45.0 };
+    } else if (rowNum >= 8) {
+      return { section: "Mezzanine Tier", price: 75.0 };
+    } else if (rowNum >= 4) {
+      return { section: "Orchestra Standard", price: 120.0 };
+    } else {
+      return { section: "Orchestra VIP", price: 180.0 };
+    }
+  }
+
   function renderVenueMap() {
     for (let r = 13; r >= 8; r--) {
       blockUpper.appendChild(createRowElement(r));
@@ -26,6 +38,19 @@ document.addEventListener("DOMContentLoaded", () => {
       seatBtn.textContent = s;
       seatBtn.dataset.row = rowNum;
       seatBtn.dataset.seat = s;
+
+      seatBtn.addEventListener("click", () => {
+        const config = getRowConfig(rowNum);
+        document.getElementById("seat-section").textContent = config.section;
+        document.getElementById("seat-row").textContent = rowNum;
+        document.getElementById("seat-number").textContent = s;
+        document.getElementById("seat-price").textContent =
+          `$${config.price.toFixed(2)}`;
+        document.getElementById("seat-status").textContent =
+          "Available (Inspected)";
+        document.getElementById("add-to-cart-btn").disabled = false;
+      });
+
       rowDiv.appendChild(seatBtn);
     }
 
