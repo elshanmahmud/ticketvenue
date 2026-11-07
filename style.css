@@ -78,3 +78,19 @@ header {
   font-weight: bold;
   cursor: pointer;
 }
+
+.nav-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 15px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.nav-btn {
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
