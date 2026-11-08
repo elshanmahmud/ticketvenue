@@ -1,24 +1,30 @@
 function getRowConfig(rowNum) {
   if (rowNum >= 10) {
-    return { section: "Balcony Tier", price: 20.0, tierClass: "tier-balcony" };
+    return { section: "Balcony Tier", price: 45.0, tierClass: "tier-balcony" };
   } else if (rowNum >= 7) {
     return {
       section: "Mezzanine Tier",
-      price: 35.0,
+      price: 75.0,
       tierClass: "tier-mezzanine",
     };
   } else if (rowNum >= 3) {
     return {
       section: "Standard Tier",
-      price: 70.0,
+      price: 120.0,
       tierClass: "tier-standard",
     };
   } else {
-    return { section: "VIP Tier", price: 100.0, tierClass: "tier-vip" };
+    return { section: "VIP Tier", price: 180.0, tierClass: "tier-vip" };
   }
 }
 
-function createRowElement(rowNum, selectedSeatState, seatStates) {
+function createRowElement(
+  rowNum,
+  selectedSeatState,
+  seatStates,
+  cart,
+  renderCallback,
+) {
   const rowDiv = document.createElement("div");
   rowDiv.className = "seat-row";
 
@@ -38,6 +44,7 @@ function createRowElement(rowNum, selectedSeatState, seatStates) {
 
     const seatKey = `${rowNum}-${s}`;
 
+    // Demo unavailable seats
     if (
       !seatStates[seatKey] &&
       ((rowNum === 3 && (s === 5 || s === 6)) ||
@@ -48,6 +55,7 @@ function createRowElement(rowNum, selectedSeatState, seatStates) {
       seatStates[seatKey] = "unavailable";
     }
 
+    // Apply persistent states
     if (seatStates[seatKey] === "unavailable") {
       seatBtn.classList.add("unavailable");
       seatBtn.disabled = true;
@@ -55,20 +63,18 @@ function createRowElement(rowNum, selectedSeatState, seatStates) {
       seatBtn.classList.add("in-cart");
     }
 
+    // Seat click inspection listener
     seatBtn.addEventListener("click", () => {
       if (seatStates[seatKey] === "unavailable") return;
 
       if (selectedSeatState.current) {
-        if (!selectedSeatState.current.classList.contains("in-cart")) {
-          selectedSeatState.current.classList.remove("selected");
-        } else {
-          selectedSeatState.current.classList.remove("selected");
-        }
+        selectedSeatState.current.classList.remove("selected");
       }
 
       seatBtn.classList.add("selected");
       selectedSeatState.current = seatBtn;
 
+      // Track currently inspected seat object for cart action
       selectedSeatState.inspected = {
         row: rowNum,
         seatNum: s,
@@ -185,6 +191,7 @@ function initPanAndZoom() {
   let panX = 0;
   let panY = 0;
   const mapInner = document.getElementById("venue-map-inner");
+  const viewport = document.getElementById("venue-viewport");
 
   function updateTransform() {
     mapInner.style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`;
@@ -224,6 +231,43 @@ function initPanAndZoom() {
     panY = 0;
     updateTransform();
   });
+
+  viewport.addEventListener(
+    "wheel",
+    (e) => {
+      e.preventDefault();
+      if (e.deltaY < 0) {
+        if (currentZoom < 1.8) currentZoom += 0.1;
+      } else {
+        if (currentZoom > 0.6) currentZoom -= 0.1;
+      }
+      updateTransform();
+    },
+    { passive: false },
+  );
+
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+
+  viewport.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    startX = e.clientX - panX;
+    startY = e.clientY - panY;
+    viewport.style.cursor = "grabbing";
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    panX = e.clientX - startX;
+    panY = e.clientY - startY;
+    updateTransform();
+  });
+
+  window.addEventListener("mouseup", () => {
+    isDragging = false;
+    viewport.style.cursor = "default";
+  });
 }
 
 function initializeApp() {
@@ -239,6 +283,7 @@ function initializeApp() {
   updateCartUI(cart, seatStates, renderCallback);
   initPanAndZoom();
 
+  // Add to Cart Button Listener
   const addToCartBtn = document.getElementById("add-to-cart-btn");
   addToCartBtn.addEventListener("click", () => {
     if (!selectedSeatState.inspected) return;
