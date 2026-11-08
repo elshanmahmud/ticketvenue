@@ -23,7 +23,7 @@ header {
 
 .main-content h2 {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .main-content {
@@ -36,13 +36,6 @@ header {
   width: calc(30% - 10px);
   padding: 15px;
   border: 1px solid #ccc;
-}
-
-.section {
-  text-align: center;
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-top: 15px;
 }
 
 .seat-row {
@@ -58,6 +51,7 @@ header {
   border-radius: 4px;
   font-weight: bold;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .seat-details {
@@ -151,31 +145,62 @@ header {
   letter-spacing: 2px;
 }
 
-.seat:hover:not(:disabled) {
-  background-color: #cbd5e1;
-  border-color: #3b82f6;
-}
-
-.seat.in-cart {
-  background-color: #10b981;
-  color: white;
-  border-color: #059669;
-}
-
-.seat.unavailable {
-  background-color: #ef4444;
-  color: white;
-  border-color: #dc2626;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.row-label {
+.seat-legend {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
   font-size: 12px;
   font-weight: bold;
   color: #555;
-  width: 24px;
-  text-align: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid #94a3b8;
+}
+.legend-box.vip {
+  background-color: #fef08a;
+  border-color: #eab308;
+}
+.legend-box.standard {
+  background-color: #bfdbfe;
+  border-color: #3b82f6;
+}
+.legend-box.mezzanine {
+  background-color: #bbf7d0;
+  border-color: #22c55e;
+}
+.legend-box.balcony {
+  background-color: #fed7aa;
+  border-color: #f97316;
+}
+
+.seat.tier-vip {
+  background-color: #fef08a;
+  border-color: #eab308;
+  color: #713f12;
+}
+.seat.tier-standard {
+  background-color: #bfdbfe;
+  border-color: #3b82f6;
+  color: #1e3a8a;
+}
+.seat.tier-mezzanine {
+  background-color: #bbf7d0;
+  border-color: #22c55e;
+  color: #14532d;
+}
+.seat.tier-balcony {
+  background-color: #fed7aa;
+  border-color: #f97316;
+  color: #7c2d12;
 }
 
 .seat.selected {
@@ -190,4 +215,12 @@ header {
   border-color: #dc2626 !important;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+.row-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+  width: 24px;
+  text-align: center;
 }

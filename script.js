@@ -1,91 +1,97 @@
-document.addEventListener("DOMContentLoaded", () => {
+function getRowConfig(rowNum) {
+  if (rowNum >= 10) {
+    return { section: "Balcony Tier", price: 45.0, tierClass: "tier-balcony" };
+  } else if (rowNum >= 7) {
+    return {
+      section: "Mezzanine Tier",
+      price: 75.0,
+      tierClass: "tier-mezzanine",
+    };
+  } else if (rowNum >= 3) {
+    return {
+      section: "Standard Tier",
+      price: 120.0,
+      tierClass: "tier-standard",
+    };
+  } else {
+    return { section: "VIP Tier", price: 180.0, tierClass: "tier-vip" };
+  }
+}
+
+function createRowElement(rowNum, selectedSeatState) {
+  const rowDiv = document.createElement("div");
+  rowDiv.className = "seat-row";
+
+  const leftLabel = document.createElement("span");
+  leftLabel.className = "row-label";
+  leftLabel.textContent = rowNum;
+  rowDiv.appendChild(leftLabel);
+
+  const config = getRowConfig(rowNum);
+
+  for (let s = 1; s <= 16; s++) {
+    const seatBtn = document.createElement("button");
+    seatBtn.className = `seat ${config.tierClass}`;
+    seatBtn.textContent = s;
+    seatBtn.dataset.row = rowNum;
+    seatBtn.dataset.seat = s;
+
+    if (
+      (rowNum === 3 && (s === 5 || s === 6)) ||
+      (rowNum === 8 && (s === 10 || s === 11)) ||
+      (rowNum === 2 && s === 12) ||
+      (rowNum === 10 && s === 4)
+    ) {
+      seatBtn.classList.add("unavailable");
+      seatBtn.disabled = true;
+    }
+
+    seatBtn.addEventListener("click", () => {
+      if (selectedSeatState.current) {
+        selectedSeatState.current.classList.remove("selected");
+      }
+
+      seatBtn.classList.add("selected");
+      selectedSeatState.current = seatBtn;
+
+      document.getElementById("seat-section").textContent = config.section;
+      document.getElementById("seat-row").textContent = rowNum;
+      document.getElementById("seat-number").textContent = s;
+      document.getElementById("seat-price").textContent =
+        `$${config.price.toFixed(2)}`;
+      document.getElementById("seat-status").textContent =
+        "Available (Inspected)";
+      document.getElementById("add-to-cart-btn").disabled = false;
+    });
+
+    rowDiv.appendChild(seatBtn);
+  }
+
+  const rightLabel = document.createElement("span");
+  rightLabel.className = "row-label";
+  rightLabel.textContent = rowNum;
+  rowDiv.appendChild(rightLabel);
+
+  return rowDiv;
+}
+
+function renderVenueMap(selectedSeatState) {
   const blockUpper = document.getElementById("block-upper");
   const blockLower = document.getElementById("block-lower");
 
-  function getRowConfig(rowNum) {
-    if (rowNum >= 11) {
-      return { section: "Balcony Tier", price: 45.0 };
-    } else if (rowNum >= 8) {
-      return { section: "Mezzanine Tier", price: 75.0 };
-    } else if (rowNum >= 4) {
-      return { section: "Orchestra Standard", price: 120.0 };
-    } else {
-      return { section: "Orchestra VIP", price: 180.0 };
-    }
+  blockLower.innerHTML =
+    '<div class="block-title">Orchestra / Lower Tier</div>';
+  blockUpper.innerHTML = '<div class="block-title">Balcony / Upper Tier</div>';
+
+  for (let r = 1; r <= 6; r++) {
+    blockLower.appendChild(createRowElement(r, selectedSeatState));
   }
-
-  let selectedSeatBtn = null;
-
-  function renderVenueMap() {
-    blockLower.innerHTML =
-      '<div class="block-title">Orchestra / Lower Tier</div>';
-    blockUpper.innerHTML =
-      '<div class="block-title">Balcony / Upper Tier</div>';
-
-    for (let r = 1; r <= 6; r++) {
-      blockLower.appendChild(createRowElement(r));
-    }
-    for (let r = 7; r <= 12; r++) {
-      blockUpper.appendChild(createRowElement(r));
-    }
+  for (let r = 7; r <= 12; r++) {
+    blockUpper.appendChild(createRowElement(r, selectedSeatState));
   }
+}
 
-  function createRowElement(rowNum) {
-    const rowDiv = document.createElement("div");
-    rowDiv.className = "seat-row";
-
-    const leftLabel = document.createElement("span");
-    leftLabel.className = "row-label";
-    leftLabel.textContent = rowNum;
-    rowDiv.appendChild(leftLabel);
-
-    for (let s = 1; s <= 16; s++) {
-      const seatBtn = document.createElement("button");
-      seatBtn.className = "seat";
-      seatBtn.textContent = s;
-      seatBtn.dataset.row = rowNum;
-      seatBtn.dataset.seat = s;
-
-      if (
-        (rowNum === 3 && (s === 5 || s === 6)) ||
-        (rowNum === 8 && (s === 10 || s === 11)) ||
-        (rowNum === 2 && s === 12) ||
-        (rowNum === 10 && s === 4)
-      ) {
-        seatBtn.classList.add("unavailable");
-        seatBtn.disabled = true;
-      }
-
-      seatBtn.addEventListener("click", () => {
-        if (selectedSeatBtn) {
-          selectedSeatBtn.classList.remove("selected");
-        }
-
-        seatBtn.classList.add("selected");
-        selectedSeatBtn = seatBtn;
-
-        const config = getRowConfig(rowNum);
-        document.getElementById("seat-section").textContent = config.section;
-        document.getElementById("seat-row").textContent = rowNum;
-        document.getElementById("seat-number").textContent = s;
-        document.getElementById("seat-price").textContent =
-          `$${config.price.toFixed(2)}`;
-        document.getElementById("seat-status").textContent =
-          "Available (Inspected)";
-        document.getElementById("add-to-cart-btn").disabled = false;
-      });
-
-      rowDiv.appendChild(seatBtn);
-    }
-
-    const rightLabel = document.createElement("span");
-    rightLabel.className = "row-label";
-    rightLabel.textContent = rowNum;
-    rowDiv.appendChild(rightLabel);
-
-    return rowDiv;
-  }
-
+function initPanAndZoom() {
   let currentZoom = 1;
   let panX = 0;
   let panY = 0;
@@ -131,6 +137,16 @@ document.addEventListener("DOMContentLoaded", () => {
     panY = 0;
     updateTransform();
   });
+}
 
-  renderVenueMap();
-});
+function initializeApp() {
+  const selectedSeatState = { current: null };
+  renderVenueMap(selectedSeatState);
+  initPanAndZoom();
+}
+
+function runMain() {
+  initializeApp();
+}
+
+document.addEventListener("DOMContentLoaded", runMain);
