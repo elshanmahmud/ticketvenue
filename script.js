@@ -1,20 +1,20 @@
 function getRowConfig(rowNum) {
   if (rowNum >= 10) {
-    return { section: "Balcony Tier", price: 45.0, tierClass: "tier-balcony" };
+    return { section: "Balcony Tier", price: 20.0, tierClass: "tier-balcony" };
   } else if (rowNum >= 7) {
     return {
       section: "Mezzanine Tier",
-      price: 75.0,
+      price: 35.0,
       tierClass: "tier-mezzanine",
     };
   } else if (rowNum >= 3) {
     return {
       section: "Standard Tier",
-      price: 120.0,
+      price: 70.0,
       tierClass: "tier-standard",
     };
   } else {
-    return { section: "VIP Tier", price: 180.0, tierClass: "tier-vip" };
+    return { section: "VIP Tier", price: 100.0, tierClass: "tier-vip" };
   }
 }
 
