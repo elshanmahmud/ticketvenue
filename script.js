@@ -15,11 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderVenueMap() {
-    for (let r = 13; r >= 8; r--) {
-      blockUpper.appendChild(createRowElement(r));
-    }
-    for (let r = 7; r >= 1; r--) {
+    blockLower.innerHTML =
+      '<div class="block-title">Orchestra / Lower Tier</div>';
+    blockUpper.innerHTML =
+      '<div class="block-title">Balcony / Upper Tier</div>';
+
+    for (let r = 1; r <= 6; r++) {
       blockLower.appendChild(createRowElement(r));
+    }
+    for (let r = 7; r <= 12; r++) {
+      blockUpper.appendChild(createRowElement(r));
     }
   }
 
