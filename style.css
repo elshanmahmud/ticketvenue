@@ -145,6 +145,7 @@ header {
   letter-spacing: 2px;
 }
 
+/* Legend Bar Styles */
 .seat-legend {
   display: flex;
   justify-content: center;
@@ -166,47 +167,53 @@ header {
   border: 1px solid #94a3b8;
 }
 .legend-box.vip {
-  background-color: #fef08a;
-  border-color: #eab308;
+  background-color: #ede9fe;
+  border-color: #7c3aed;
 }
 .legend-box.standard {
-  background-color: #bfdbfe;
-  border-color: #3b82f6;
+  background-color: #eff6ff;
+  border-color: #2563eb;
 }
 .legend-box.mezzanine {
-  background-color: #bbf7d0;
-  border-color: #22c55e;
+  background-color: #ccfbf1;
+  border-color: #0d9488;
 }
 .legend-box.balcony {
-  background-color: #fed7aa;
-  border-color: #f97316;
+  background-color: #f1f5f9;
+  border-color: #64748b;
 }
 
 .seat.tier-vip {
-  background-color: #fef08a;
-  border-color: #eab308;
-  color: #713f12;
+  background-color: #ede9fe;
+  border-color: #7c3aed;
+  color: #5b21b6;
 }
 .seat.tier-standard {
-  background-color: #bfdbfe;
-  border-color: #3b82f6;
-  color: #1e3a8a;
+  background-color: #eff6ff;
+  border-color: #2563eb;
+  color: #1e40af;
 }
 .seat.tier-mezzanine {
-  background-color: #bbf7d0;
-  border-color: #22c55e;
-  color: #14532d;
+  background-color: #ccfbf1;
+  border-color: #0d9488;
+  color: #115e59;
 }
 .seat.tier-balcony {
-  background-color: #fed7aa;
-  border-color: #f97316;
-  color: #7c2d12;
+  background-color: #f1f5f9;
+  border-color: #64748b;
+  color: #334155;
 }
 
 .seat.selected {
   background-color: #f59e0b !important;
   color: white !important;
   border-color: #d97706 !important;
+}
+
+.seat.in-cart {
+  background-color: #059669 !important;
+  color: white !important;
+  border-color: #047857 !important;
 }
 
 .seat.unavailable {

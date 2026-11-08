@@ -1,24 +1,24 @@
 function getRowConfig(rowNum) {
   if (rowNum >= 10) {
-    return { section: "Balcony Tier", price: 45.0, tierClass: "tier-balcony" };
+    return { section: "Balcony Tier", price: 20.0, tierClass: "tier-balcony" };
   } else if (rowNum >= 7) {
     return {
       section: "Mezzanine Tier",
-      price: 75.0,
+      price: 35.0,
       tierClass: "tier-mezzanine",
     };
   } else if (rowNum >= 3) {
     return {
       section: "Standard Tier",
-      price: 120.0,
+      price: 70.0,
       tierClass: "tier-standard",
     };
   } else {
-    return { section: "VIP Tier", price: 180.0, tierClass: "tier-vip" };
+    return { section: "VIP Tier", price: 100.0, tierClass: "tier-vip" };
   }
 }
 
-function createRowElement(rowNum, selectedSeatState) {
+function createRowElement(rowNum, selectedSeatState, seatStates) {
   const rowDiv = document.createElement("div");
   rowDiv.className = "seat-row";
 
@@ -36,32 +36,64 @@ function createRowElement(rowNum, selectedSeatState) {
     seatBtn.dataset.row = rowNum;
     seatBtn.dataset.seat = s;
 
+    const seatKey = `${rowNum}-${s}`;
+
     if (
-      (rowNum === 3 && (s === 5 || s === 6)) ||
-      (rowNum === 8 && (s === 10 || s === 11)) ||
-      (rowNum === 2 && s === 12) ||
-      (rowNum === 10 && s === 4)
+      !seatStates[seatKey] &&
+      ((rowNum === 3 && (s === 5 || s === 6)) ||
+        (rowNum === 8 && (s === 10 || s === 11)) ||
+        (rowNum === 2 && s === 12) ||
+        (rowNum === 10 && s === 4))
     ) {
+      seatStates[seatKey] = "unavailable";
+    }
+
+    if (seatStates[seatKey] === "unavailable") {
       seatBtn.classList.add("unavailable");
       seatBtn.disabled = true;
+    } else if (seatStates[seatKey] === "in-cart") {
+      seatBtn.classList.add("in-cart");
     }
 
     seatBtn.addEventListener("click", () => {
+      if (seatStates[seatKey] === "unavailable") return;
+
       if (selectedSeatState.current) {
-        selectedSeatState.current.classList.remove("selected");
+        if (!selectedSeatState.current.classList.contains("in-cart")) {
+          selectedSeatState.current.classList.remove("selected");
+        } else {
+          selectedSeatState.current.classList.remove("selected");
+        }
       }
 
       seatBtn.classList.add("selected");
       selectedSeatState.current = seatBtn;
+
+      selectedSeatState.inspected = {
+        row: rowNum,
+        seatNum: s,
+        section: config.section,
+        price: config.price,
+        key: seatKey,
+      };
 
       document.getElementById("seat-section").textContent = config.section;
       document.getElementById("seat-row").textContent = rowNum;
       document.getElementById("seat-number").textContent = s;
       document.getElementById("seat-price").textContent =
         `$${config.price.toFixed(2)}`;
-      document.getElementById("seat-status").textContent =
-        "Available (Inspected)";
-      document.getElementById("add-to-cart-btn").disabled = false;
+
+      const addToCartBtn = document.getElementById("add-to-cart-btn");
+      if (seatStates[seatKey] === "in-cart") {
+        document.getElementById("seat-status").textContent = "In Cart";
+        addToCartBtn.disabled = true;
+        addToCartBtn.textContent = "ALREADY IN CART";
+      } else {
+        document.getElementById("seat-status").textContent =
+          "Available (Inspected)";
+        addToCartBtn.disabled = false;
+        addToCartBtn.textContent = "ADD TO CART";
+      }
     });
 
     rowDiv.appendChild(seatBtn);
@@ -75,7 +107,7 @@ function createRowElement(rowNum, selectedSeatState) {
   return rowDiv;
 }
 
-function renderVenueMap(selectedSeatState) {
+function renderVenueMap(selectedSeatState, seatStates, cart, renderCallback) {
   const blockUpper = document.getElementById("block-upper");
   const blockLower = document.getElementById("block-lower");
 
@@ -84,11 +116,68 @@ function renderVenueMap(selectedSeatState) {
   blockUpper.innerHTML = '<div class="block-title">Balcony / Upper Tier</div>';
 
   for (let r = 1; r <= 6; r++) {
-    blockLower.appendChild(createRowElement(r, selectedSeatState));
+    blockLower.appendChild(
+      createRowElement(r, selectedSeatState, seatStates, cart, renderCallback),
+    );
   }
   for (let r = 7; r <= 12; r++) {
-    blockUpper.appendChild(createRowElement(r, selectedSeatState));
+    blockUpper.appendChild(
+      createRowElement(r, selectedSeatState, seatStates, cart, renderCallback),
+    );
   }
+}
+
+function updateCartUI(cart, seatStates, renderCallback) {
+  const cartItemsList = document.getElementById("cart-items-list");
+  const cartTotalPriceEl = document.getElementById("cart-total-price");
+
+  cartItemsList.innerHTML = "";
+  if (cart.length === 0) {
+    cartItemsList.innerHTML =
+      '<p style="color: #666; font-size: 13px; text-align: center;">Cart is empty</p>';
+    cartTotalPriceEl.textContent = "$0.00";
+    return;
+  }
+
+  let total = 0;
+  cart.forEach((item) => {
+    total += item.price;
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "cart-item";
+    itemDiv.style.display = "flex";
+    itemDiv.style.justifyContent = "space-between";
+    itemDiv.style.alignItems = "center";
+    itemDiv.style.padding = "4px 0";
+    itemDiv.style.fontSize = "13px";
+    itemDiv.innerHTML = `
+      <span>R${item.row} S${item.seatNum} ($${item.price.toFixed(2)})</span>
+      <button class="remove-btn" data-key="${item.key}" style="background:#ef4444; color:#fff; border:none; padding:2px 6px; border-radius:3px; cursor:pointer; font-size:11px;">Remove</button>
+    `;
+
+    itemDiv.querySelector(".remove-btn").addEventListener("click", () => {
+      removeFromCart(item.key, cart, seatStates, renderCallback);
+    });
+
+    cartItemsList.appendChild(itemDiv);
+  });
+
+  cartTotalPriceEl.textContent = `$${total.toFixed(2)}`;
+}
+
+function removeFromCart(key, cart, seatStates, renderCallback) {
+  const index = cart.findIndex((item) => item.key === key);
+  if (index !== -1) cart.splice(index, 1);
+  delete seatStates[key];
+
+  localStorage.setItem("venue_cart", JSON.stringify(cart));
+  localStorage.setItem("venue_seat_states", JSON.stringify(seatStates));
+
+  document.getElementById("seat-status").textContent = "Available (Inspected)";
+  document.getElementById("add-to-cart-btn").disabled = false;
+  document.getElementById("add-to-cart-btn").textContent = "ADD TO CART";
+
+  renderCallback();
+  updateCartUI(cart, seatStates, renderCallback);
 }
 
 function initPanAndZoom() {
@@ -107,14 +196,12 @@ function initPanAndZoom() {
       updateTransform();
     }
   });
-
   document.getElementById("zoom-out-btn").addEventListener("click", () => {
     if (currentZoom > 0.6) {
       currentZoom -= 0.15;
       updateTransform();
     }
   });
-
   document.getElementById("pan-up-btn").addEventListener("click", () => {
     panY += 30;
     updateTransform();
@@ -140,9 +227,40 @@ function initPanAndZoom() {
 }
 
 function initializeApp() {
-  const selectedSeatState = { current: null };
-  renderVenueMap(selectedSeatState);
+  let cart = JSON.parse(localStorage.getItem("venue_cart")) || [];
+  let seatStates = JSON.parse(localStorage.getItem("venue_seat_states")) || {};
+  const selectedSeatState = { current: null, inspected: null };
+
+  const renderCallback = () => {
+    renderVenueMap(selectedSeatState, seatStates, cart, renderCallback);
+  };
+
+  renderCallback();
+  updateCartUI(cart, seatStates, renderCallback);
   initPanAndZoom();
+
+  const addToCartBtn = document.getElementById("add-to-cart-btn");
+  addToCartBtn.addEventListener("click", () => {
+    if (!selectedSeatState.inspected) return;
+
+    if (cart.some((item) => item.key === selectedSeatState.inspected.key)) {
+      alert("This seat is already in your cart.");
+      return;
+    }
+
+    cart.push(selectedSeatState.inspected);
+    seatStates[selectedSeatState.inspected.key] = "in-cart";
+
+    localStorage.setItem("venue_cart", JSON.stringify(cart));
+    localStorage.setItem("venue_seat_states", JSON.stringify(seatStates));
+
+    renderCallback();
+    updateCartUI(cart, seatStates, renderCallback);
+
+    document.getElementById("seat-status").textContent = "In Cart";
+    addToCartBtn.disabled = true;
+    addToCartBtn.textContent = "ALREADY IN CART";
+  });
 }
 
 function runMain() {
