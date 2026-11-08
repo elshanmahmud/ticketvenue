@@ -44,7 +44,24 @@ document.addEventListener("DOMContentLoaded", () => {
       seatBtn.dataset.row = rowNum;
       seatBtn.dataset.seat = s;
 
+      if (
+        (rowNum === 3 && (s === 5 || s === 6)) ||
+        (rowNum === 8 && (s === 10 || s === 11)) ||
+        (rowNum === 2 && s === 12) ||
+        (rowNum === 10 && s === 4)
+      ) {
+        seatBtn.classList.add("unavailable");
+        seatBtn.disabled = true;
+      }
+
       seatBtn.addEventListener("click", () => {
+        if (selectedSeatBtn) {
+          selectedSeatBtn.classList.remove("selected");
+        }
+
+        seatBtn.classList.add("selected");
+        selectedSeatBtn = seatBtn;
+
         const config = getRowConfig(rowNum);
         document.getElementById("seat-section").textContent = config.section;
         document.getElementById("seat-row").textContent = rowNum;

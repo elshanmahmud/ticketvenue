@@ -177,3 +177,17 @@ header {
   width: 24px;
   text-align: center;
 }
+
+.seat.selected {
+  background-color: #f59e0b !important;
+  color: white !important;
+  border-color: #d97706 !important;
+}
+
+.seat.unavailable {
+  background-color: #ef4444 !important;
+  color: white !important;
+  border-color: #dc2626 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
