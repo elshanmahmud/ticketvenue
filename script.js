@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  let selectedSeatBtn = null;
+
   function renderVenueMap() {
     blockLower.innerHTML =
       '<div class="block-title">Orchestra / Lower Tier</div>';
@@ -84,55 +86,51 @@ document.addEventListener("DOMContentLoaded", () => {
     return rowDiv;
   }
 
+  let currentZoom = 1;
+  let panX = 0;
+  let panY = 0;
+  const mapInner = document.getElementById("venue-map-inner");
+
+  function updateTransform() {
+    mapInner.style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`;
+  }
+
+  document.getElementById("zoom-in-btn").addEventListener("click", () => {
+    if (currentZoom < 1.8) {
+      currentZoom += 0.15;
+      updateTransform();
+    }
+  });
+
+  document.getElementById("zoom-out-btn").addEventListener("click", () => {
+    if (currentZoom > 0.6) {
+      currentZoom -= 0.15;
+      updateTransform();
+    }
+  });
+
+  document.getElementById("pan-up-btn").addEventListener("click", () => {
+    panY += 30;
+    updateTransform();
+  });
+  document.getElementById("pan-down-btn").addEventListener("click", () => {
+    panY -= 30;
+    updateTransform();
+  });
+  document.getElementById("pan-left-btn").addEventListener("click", () => {
+    panX += 30;
+    updateTransform();
+  });
+  document.getElementById("pan-right-btn").addEventListener("click", () => {
+    panX -= 30;
+    updateTransform();
+  });
+  document.getElementById("reset-view-btn").addEventListener("click", () => {
+    currentZoom = 1;
+    panX = 0;
+    panY = 0;
+    updateTransform();
+  });
+
   renderVenueMap();
-});
-
-let currentZoom = 1;
-let panX = 0;
-let panY = 0;
-const mapInner = document.getElementById("venue-map-inner");
-
-function updateTransform() {
-  mapInner.style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`;
-}
-
-document.getElementById("zoom-in-btn").addEventListener("click", () => {
-  if (currentZoom < 1.8) {
-    currentZoom += 0.15;
-    updateTransform();
-  }
-});
-
-document.getElementById("zoom-out-btn").addEventListener("click", () => {
-  if (currentZoom > 0.6) {
-    currentZoom -= 0.15;
-    updateTransform();
-  }
-});
-
-document.getElementById("pan-up-btn").addEventListener("click", () => {
-  panY += 30;
-  updateTransform();
-});
-
-document.getElementById("pan-down-btn").addEventListener("click", () => {
-  panY -= 30;
-  updateTransform();
-});
-
-document.getElementById("pan-left-btn").addEventListener("click", () => {
-  panX += 30;
-  updateTransform();
-});
-
-document.getElementById("pan-right-btn").addEventListener("click", () => {
-  panX -= 30;
-  updateTransform();
-});
-
-document.getElementById("reset-view-btn").addEventListener("click", () => {
-  currentZoom = 1;
-  panX = 0;
-  panY = 0;
-  updateTransform();
 });
